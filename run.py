@@ -32,21 +32,9 @@ if optimizer == "sp":
 
 if optimizer == "rs":
     if experiment == "branin":
-        results = RS(branin,2,100,[[0,1],[0,1]],iterations,repeats)
-        f = open("/home/isolomatin/spearmint/spearmint/examples/braninpy/RSresults.txt",'w')
-        for i in range(len(results)):
-            f.write(str(results[i])+"\n")
-        f.close()
+        RS(branin,2,100,[[0,1],[0,1]],iterations,repeats)
         print "Experiments are done."
 
     if experiment == "hartmann":
-        results = RS(hartmann,3,100,[[0,1],[0,1],[0,1]],iterations,repeats)
-        f = open("/home/isolomatin/spearmint/spearmint/examples/"+experiment+"py/RSresults.txt",'w')
-        for i in range(len(results)):
-            f.write(str(results[i])+"\n")
-        f.close()
+        RS(hartmann,3,100,[[0,1],[0,1],[0,1]],iterations,repeats)
         print "Experiments are done."
-
-
-                           
-
