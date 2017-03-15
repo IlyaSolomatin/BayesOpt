@@ -61,7 +61,7 @@ def RS(function, ndimensions, R_steps, ranges, ITERATIONS, EXPERIMENTS):
 
     results_of_R = sorted(results_of_R)
     best_R = results_of_R[0][1]
-    #print "Best R: ",best_R
+    print "Best R: ",best_R
 
     results = []
     for _ in range(EXPERIMENTS):
@@ -90,17 +90,17 @@ def RS(function, ndimensions, R_steps, ranges, ITERATIONS, EXPERIMENTS):
             if f < current_result:
                 current_result = f
                 x = x_new
+            out = open("RSresults.csv", 'a')
+            out.write(str(i) + "," + str(current_result) + "\n")
+            out.close()
             i += 1
-            experiment_results.append(current_result)
-        results.append(experiment_results)
+            # experiment_results.append(current_result)
+        # results.append(experiment_results)
 
-    results = np.asarray(results).T
-    mean_results = []
-    for i in range(len(results)):
-        mean_results.append(results[i].mean())
-    mean_results = np.asarray(mean_results).T
+    # results = np.asarray(results).T
+    # mean_results = []
+    # for i in range(len(results)):
+    #     mean_results.append(results[i].mean())
+    # mean_results = np.asarray(mean_results).T
 
-    return mean_results
-
-
-
+    return 0
