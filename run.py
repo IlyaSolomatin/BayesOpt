@@ -11,6 +11,9 @@ from spearmint.spearmint.examples.braninpy.branin import branin
 from spearmint.spearmint.examples.hartmannpy.hartmann import hartmann
 from RandomSearch import RS
 from numpy.random import randint
+import hyperopt
+from HyperOpt import HO
+import HyperOpt
 
 optimizer = sys.argv[1]
 experiment = sys.argv[2]
@@ -134,3 +137,10 @@ if optimizer == "SMAC":
                 output_file.write(str(results[i]))
                 output_file.write("\n")
         output_file.close()
+
+if optimizer == "HO":
+    if experiment == "branin":
+        HO(branin,2,[[0,1],[0,1]],iterations,repeats)
+
+    if experiment == "hartmann":
+        HO(hartmann,3,[[0,1],[0,1],[0,1]],iterations,repeats)
