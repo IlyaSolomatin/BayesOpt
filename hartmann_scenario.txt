@@ -1,0 +1,6 @@
+algo = python hartmann.py
+paramfile = hartmann_pcs.pcs
+run_obj = quality
+runcount_limit = 50
+deterministic = 1
+output_dir = SMAC_output
