@@ -10,6 +10,7 @@ import os.path
 from spearmint.spearmint.examples.braninpy.branin import branin
 from spearmint.spearmint.examples.hartmannpy.hartmann import hartmann
 from RandomSearch import RS
+from Bergstra import Bergstra
 from numpy.random import randint
 import hyperopt
 from HyperOpt import HO
@@ -144,3 +145,11 @@ if optimizer == "HO":
 
     if experiment == "hartmann":
         HO(hartmann,3,[[0,1],[0,1],[0,1]],iterations,repeats)
+
+if optimizer == "BRS":
+    if experiment == "branin":
+        Bergstra(branin,2,[[0,1],[0,1]],iterations,repeats)
+
+    if experiment == "hartmann":
+        Bergstra(hartmann, 3, [[0, 1], [0, 1], [0, 1]], iterations, repeats)
+
