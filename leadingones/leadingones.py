@@ -6,10 +6,10 @@ def main():
     inputs = []
     for i in range(0,32,2):
         inputs.append(float(sys.argv[7+i]))
-    tmp = leading_ones(inputs)
+    tmp = leadingones(inputs)
     print('Result for SMAC: SUCCESS, -1, -1, %f, %s' % (tmp, seed))
 
-def leading_ones(x):
+def leadingones(x):
 
     count = 0
     for i in x:
