@@ -3,7 +3,7 @@ import sys
 import math
 import time
 
-def leading_ones(x):
+def leadingones(x):
 
     count = 0
     for i in x:
@@ -18,4 +18,4 @@ def leading_ones(x):
 def main(job_id, params):
   print 'Anything printed here will end up in the output directory for job #:', str(job_id)
   print params
-  return leading_ones(params['X'])
+  return leadingones(params['X'])
