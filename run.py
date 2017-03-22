@@ -9,6 +9,7 @@ import json
 import os.path
 from spearmint.spearmint.examples.braninpy.branin import branin
 from spearmint.spearmint.examples.hartmannpy.hartmann import hartmann
+from spearmint.spearmint.examples.leadingonespy.leadingones import leadingones
 from RandomSearch import RS
 from Bergstra import Bergstra
 from numpy.random import randint
@@ -21,6 +22,7 @@ experiment = sys.argv[2]
 iterations = int(sys.argv[3])
 repeats = int(sys.argv[4]) 
 
+#Spearmint
 if optimizer == "sp":
     for i in range(repeats):
         p = subprocess.Popen('~/spearmint/spearmint/bin/spearmint --max-concurrent=8 --max-finished-jobs='+str(iterations)+' ~/spearmint/spearmint/examples/'+experiment+'py/config.pb --driver=local --method=GPEIOptChooser --method-args=noiseless=1 > stdout.txt 2> stderr.txt',shell=True)
@@ -37,6 +39,7 @@ if optimizer == "sp":
         call(["./clear_but_trace.py "+experiment],shell=True)
     print("Experiments are done.")
 
+#RastriginRandomSearch
 if optimizer == "rs":
     if experiment == "branin":
         RS(branin,2,100,[[0,1],[0,1]],iterations,repeats)
@@ -46,7 +49,11 @@ if optimizer == "rs":
         RS(hartmann,3,100,[[0,1],[0,1],[0,1]],iterations,repeats)
         print("Experiments are done.")
 
-if optimizer == "SMAC":
+    if experiment == "leadingones":
+        print("This optimizer works only with continuous functions.")
+
+#SMAC
+if optimizer == "smac":
     if experiment == "branin":
         os.chdir("./SMAC3-master/examples/branin/")
         call(["rm branin_scenario.txt"],shell=True)
@@ -139,17 +146,78 @@ if optimizer == "SMAC":
                 output_file.write("\n")
         output_file.close()
 
-if optimizer == "HO":
+    if experiment == "leadingones":
+        os.chdir("./SMAC3-master/examples/leadingones/")
+        call(["rm leadingones_scenario.txt"],shell=True)
+        scenario = open('leadingones_scenario.txt','a')
+        scenario.write("algo = python leadingones.py\n")
+        scenario.write("paramfile = leadingones_pcs.pcs\n")
+        scenario.write("run_obj = quality\n")
+        scenario.write("runcount_limit = "+str(iterations)+"\n")
+        scenario.write("deterministic = 1\n")
+        scenario.write("output_dir = SMAC_output")
+        scenario.close()
+        for i in range(repeats):
+            seed = randint(1,100000)
+            #print(seed)
+            call(["python ../../scripts/smac --seed "+str(seed)+" --scenario leadingones_scenario.txt > SMACout.txt 2> SMACerr.txt &"],shell=True)
+            while (1):
+                time.sleep(1)
+                if os.path.isfile("./SMAC_output/runhistory.json"):
+                    print("Executed run #" + str(i) + ".")
+                    break
+            call(["mv ./SMAC_output/runhistory.json ./SMAC_output/runhistory" + str(i) + ".json"],shell=True)
+            call(["rm ./SMAC_output/traj_aclib2.json"],shell=True)
+            call(["rm ./SMAC_output/traj_old.csv"], shell=True)
+        print("Experiments are done.")
+        output_file = open("SMAC_results.csv",'a')
+        for j in range(repeats):
+            with open('./SMAC_output/runhistory'+str(j)+'.json') as data_file:
+                data = json.load(data_file)
+
+            results = []
+            for i in range(len(data["data"])):
+                results.append(data["data"][i][1][0])
+
+            best_result = results[0]
+            for i in range(1, len(results)):
+                if results[i] < best_result:
+                    best_result = results[i]
+                else:
+                    results[i] = best_result
+            for i in range(len(results)):
+                output_file.write(str(i))
+                output_file.write(",")
+                output_file.write(str(results[i]))
+                output_file.write("\n")
+        output_file.close()
+
+#HyperOpt
+if optimizer == "ho":
     if experiment == "branin":
-        HO(branin,2,[[0,1],[0,1]],iterations,repeats)
+        HO(branin,2,[[0,1,"cont"],[0,1,"cont"]],iterations,repeats)
 
     if experiment == "hartmann":
-        HO(hartmann,3,[[0,1],[0,1],[0,1]],iterations,repeats)
+        HO(hartmann,3,[[0,1,"cont"],[0,1,"cont"],[0,1,"cont"]],iterations,repeats)
 
-if optimizer == "BRS":
+    if experiment == "leadingones":
+        array = []
+        for i in range(16):
+            array.append([0, 1,"discr"])
+        HO(leadingones, 16, array, iterations, repeats)
+
+#BergstraRandomSearch
+if optimizer == "brs":
     if experiment == "branin":
-        Bergstra(branin,2,[[0,1],[0,1]],iterations,repeats)
+        Bergstra(branin,2,[[0,1,"cont"],[0,1,"cont"]],iterations,repeats)
 
     if experiment == "hartmann":
-        Bergstra(hartmann, 3, [[0, 1], [0, 1], [0, 1]], iterations, repeats)
+        Bergstra(hartmann, 3, [[0, 1,"cont"], [0, 1,"cont"], [0, 1,"cont"]], iterations, repeats)
+
+    if experiment == "leadingones":
+        array = []
+        for i in range(16):
+            array.append([0, 1, "discr"])
+        Bergstra(leadingones, 16, array, iterations, repeats)
+
 

@@ -13,7 +13,13 @@ def HO(function, ndimensions, ranges, ITERATIONS, EXPERIMENTS):
     space = {}
 
     for i in range(ndimensions):
-        space["x"+str(i)] = hp.uniform('x'+str(i), ranges[i][0], ranges[i][1])
+        if ranges[i][-1] == "cont":
+            space["x"+str(i)] = hp.uniform('x'+str(i), ranges[i][0], ranges[i][1])
+        if ranges[i][-1] == "discr":
+            options = []
+            for j in range(len(ranges[i])-1):
+                options.append(ranges[i][j])
+            space["x" + str(i)] = hp.choice('x' + str(i), options)
 
     def f(x):
         global best_result

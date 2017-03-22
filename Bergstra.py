@@ -1,8 +1,6 @@
 from numpy.random import random
 from numpy import inf
-
-from numpy import square, cos
-from math import pi
+from numpy.random import choice
 
 def Bergstra(function, ndimensions, ranges, ITERATIONS, EXPERIMENTS):
 
@@ -12,9 +10,15 @@ def Bergstra(function, ndimensions, ranges, ITERATIONS, EXPERIMENTS):
 
             x = []
             for i in range(ndimensions):
-                var = random()
-                var = var*(ranges[i][1]-ranges[i][0]) + ranges[i][0]
-                x.append(var)
+                if ranges[i][-1] == "cont":
+                    var = random()
+                    var = var*(ranges[i][1]-ranges[i][0]) + ranges[i][0]
+                    x.append(var)
+                if ranges[i][-1] == "discr":
+                    options = []
+                    for j in range(len(ranges[i]) - 1):
+                        options.append(ranges[i][j])
+                    x.append(choice(options))
 
             result = function(x)
 
