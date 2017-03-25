@@ -14,7 +14,7 @@ name:     "leadingones"
 variable {
  name: "X"
  type: INT
- size: 16
+ size: 10
  min:  0
  max:  1
 }
