@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/home/isolomatin/anaconda2/envs/py3/bin/python3
 import subprocess
 from subprocess import call
 import sys
@@ -54,6 +54,9 @@ if optimizer == "rs":
 
 #SMAC
 if optimizer == "smac":
+    sys.path.append('./anaconda2/envs/py3/lib/python3.6/site-packages/')
+    sys.path.append('./anaconda2/envs/py3/lib/python3.6/site-packages/ConfigSpace')
+    print("sys path changed.")
     if experiment == "branin":
         os.chdir("./SMAC3-master/examples/branin/")
         call(["rm branin_scenario.txt"],shell=True)
@@ -147,8 +150,11 @@ if optimizer == "smac":
         output_file.close()
 
     if experiment == "leadingones":
+        print("Experiment is "+experiment)
         os.chdir("./SMAC3-master/examples/leadingones/")
+        print("Entered experiment directory")
         call(["rm leadingones_scenario.txt"],shell=True)
+        print("Removed current scenario file")
         scenario = open('leadingones_scenario.txt','a')
         scenario.write("algo = python leadingones.py\n")
         scenario.write("paramfile = leadingones_pcs.pcs\n")
@@ -157,18 +163,27 @@ if optimizer == "smac":
         scenario.write("deterministic = 1\n")
         scenario.write("output_dir = SMAC_output")
         scenario.close()
+        print("New scenario file is submitted.")
         for i in range(repeats):
+            print("Start repeating.")
+            print("Repeat # "+str(i))
             seed = randint(1,100000)
-            #print(seed)
+            print("Seed is: "+str(seed))
             call(["python ../../scripts/smac --seed "+str(seed)+" --scenario leadingones_scenario.txt > SMACout.txt 2> SMACerr.txt &"],shell=True)
+            print("SMAC script called.")
             while (1):
                 time.sleep(1)
+                print("Checking runhistory.json...")
                 if os.path.isfile("./SMAC_output/runhistory.json"):
+                    print("File is found")
                     print("Executed run #" + str(i) + ".")
-                    break
+                    break 
+                print("File not found.")
             call(["mv ./SMAC_output/runhistory.json ./SMAC_output/runhistory" + str(i) + ".json"],shell=True)
+            print("Output file is renamed.")
             call(["rm ./SMAC_output/traj_aclib2.json"],shell=True)
             call(["rm ./SMAC_output/traj_old.csv"], shell=True)
+            print("Other files are removed.")
         print("Experiments are done.")
         output_file = open("SMAC_results.csv",'a')
         for j in range(repeats):
@@ -216,8 +231,8 @@ if optimizer == "brs":
 
     if experiment == "leadingones":
         array = []
-        for i in range(16):
+        for i in range(10):
             array.append([0, 1, "discr"])
-        Bergstra(leadingones, 16, array, iterations, repeats)
+        Bergstra(leadingones, 10, array, iterations, repeats)
 
 

@@ -1,4 +1,3 @@
-#!/usr/bin/python
 from hyperopt import fmin, tpe, hp, STATUS_OK
 import numpy as np
 
@@ -32,7 +31,7 @@ def HO(function, ndimensions, ranges, ITERATIONS, EXPERIMENTS):
         result = function(argument)
         if result < best_result:
             best_result = result
-        experiment_result.append(best_result.copy())
+        experiment_result.append([best_result].copy()[0])
         return {'loss': result, 'status': STATUS_OK}
 
     result = []
