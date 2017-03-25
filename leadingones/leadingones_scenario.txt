@@ -1,6 +1,6 @@
 algo = python leadingones.py
 paramfile = leadingones_pcs.pcs
 run_obj = quality
-runcount_limit = 50
+runcount_limit = 100
 deterministic = 1
 output_dir = SMAC_output

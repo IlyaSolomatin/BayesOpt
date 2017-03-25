@@ -4,12 +4,12 @@ import numpy as np
 def main():
     seed = sys.argv[5]
     inputs = []
-    for i in range(0,32,2):
+    for i in range(0,20,2):
         inputs.append(float(sys.argv[7+i]))
-    tmp = leadingones(inputs)
+    tmp = leading_ones(inputs)
     print('Result for SMAC: SUCCESS, -1, -1, %f, %s' % (tmp, seed))
 
-def leadingones(x):
+def leading_ones(x):
 
     count = 0
     for i in x:
