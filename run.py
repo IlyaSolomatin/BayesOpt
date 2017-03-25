@@ -217,9 +217,9 @@ if optimizer == "ho":
 
     if experiment == "leadingones":
         array = []
-        for i in range(16):
+        for i in range(10):
             array.append([0, 1,"discr"])
-        HO(leadingones, 16, array, iterations, repeats)
+        HO(leadingones, 10, array, iterations, repeats)
 
 #BergstraRandomSearch
 if optimizer == "brs":
