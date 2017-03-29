@@ -10,6 +10,8 @@ import os.path
 from spearmint.spearmint.examples.braninpy.branin import branin
 from spearmint.spearmint.examples.hartmannpy.hartmann import hartmann
 from spearmint.spearmint.examples.leadingonespy.leadingones import leadingones
+from spearmint.spearmint.examples.plateaupy.plateau import plateau
+from logreg import logreg
 from RandomSearch import RS
 from Bergstra import Bergstra
 from numpy.random import randint
@@ -49,163 +51,77 @@ if optimizer == "rs":
         RS(hartmann,3,100,[[0,1],[0,1],[0,1]],iterations,repeats)
         print("Experiments are done.")
 
-    if experiment == "leadingones":
-        print("This optimizer works only with continuous functions.")
+    if experiment == "leadingones" or experiment == "logreg":
+        print("This optimizer works only with continuous parameters.")
+
+    if experiment == "plateau":
+        array = []
+        for i in range(10):
+            array.append([-2.34, 5.12])
+        RS(plateau, 10, 100, array, iterations, repeats)
+        print("Experiments are done.")
 
 #SMAC
 if optimizer == "smac":
     sys.path.append('./anaconda2/envs/py3/lib/python3.6/site-packages/')
     sys.path.append('./anaconda2/envs/py3/lib/python3.6/site-packages/ConfigSpace')
     print("sys path changed.")
-    if experiment == "branin":
-        os.chdir("./SMAC3-master/examples/branin/")
-        call(["rm branin_scenario.txt"],shell=True)
-        scenario = open('branin_scenario.txt','a')
-        scenario.write("algo = python branin.py\n")
-        scenario.write("paramfile = branin_pcs.pcs\n")
-        scenario.write("run_obj = quality\n")
-        scenario.write("runcount_limit = "+str(iterations)+"\n")
-        scenario.write("deterministic = 1\n")
-        scenario.write("output_dir = SMAC_output")
-        scenario.close()
-        for i in range(repeats):
-            seed = randint(1,100000)
-            #print(seed)
-            call(["python ../../scripts/smac --seed "+str(seed)+" --scenario branin_scenario.txt > SMACout.txt 2> SMACerr.txt &"],shell=True)
-            while (1):
-                time.sleep(1)
-                if os.path.isfile("./SMAC_output/runhistory.json"):
-                    print("Executed run #" + str(i) + ".")
-                    break
-            call(["mv ./SMAC_output/runhistory.json ./SMAC_output/runhistory" + str(i) + ".json"],shell=True)
-            call(["rm ./SMAC_output/traj_aclib2.json"],shell=True)
-            call(["rm ./SMAC_output/traj_old.csv"], shell=True)
-        print("Experiments are done.")
-        output_file = open("SMAC_results.csv",'a')
-        for j in range(repeats):
-            with open('./SMAC_output/runhistory'+str(j)+'.json') as data_file:
-                data = json.load(data_file)
+    print("Experiment is "+experiment)
+    os.chdir("./SMAC3-master/examples/"+experiment+"/")
+    print("Entered experiment directory")
+    call(["rm "+experiment+"_scenario.txt"],shell=True)
+    print("Removed current scenario file")
+    scenario = open(experiment+"_scenario.txt",'a')
+    scenario.write("algo = python "+experiment+".py\n")
+    scenario.write("paramfile = "+experiment+"_pcs.pcs\n")
+    scenario.write("run_obj = quality\n")
+    scenario.write("runcount_limit = "+str(iterations)+"\n")
+    scenario.write("deterministic = 1\n")
+    scenario.write("output_dir = SMAC_output")
+    scenario.close()
+    print("New scenario file is submitted.")
+    for i in range(repeats):
+        print("Start repeating.")
+        print("Repeat # "+str(i))
+        seed = randint(1,100000)
+        print("Seed is: "+str(seed))
+        call(["python ../../scripts/smac --seed "+str(seed)+" --scenario "+experiment+"_scenario.txt > SMACout.txt 2> SMACerr.txt &"],shell=True)
+        print("SMAC script called.")
+        while (1):
+            time.sleep(1)
+            print("Checking runhistory.json...")
+            if os.path.isfile("./SMAC_output/runhistory.json"):
+                print("File is found")
+                print("Executed run #" + str(i) + ".")
+                break
+            print("File not found.")
+        call(["mv ./SMAC_output/runhistory.json ./SMAC_output/runhistory" + str(i) + ".json"],shell=True)
+        print("Output file is renamed.")
+        call(["rm ./SMAC_output/traj_aclib2.json"],shell=True)
+        call(["rm ./SMAC_output/traj_old.csv"], shell=True)
+        print("Other files are removed.")
+    print("Experiments are done.")
+    output_file = open("SMAC_results.csv",'a')
+    for j in range(repeats):
+        with open('./SMAC_output/runhistory'+str(j)+'.json') as data_file:
+            data = json.load(data_file)
 
-            results = []
-            for i in range(len(data["data"])):
-                results.append(data["data"][i][1][0])
+        results = []
+        for i in range(len(data["data"])):
+            results.append(data["data"][i][1][0])
 
-            best_result = results[0]
-            for i in range(1, len(results)):
-                if results[i] < best_result:
-                    best_result = results[i]
-                else:
-                    results[i] = best_result
-            for i in range(len(results)):
-                output_file.write(str(i))
-                output_file.write(",")
-                output_file.write(str(results[i]))
-                output_file.write("\n")
-        output_file.close()
-
-    if experiment == "hartmann":
-        os.chdir("./SMAC3-master/examples/hartmann/")
-        call(["rm hartmann_scenario.txt"],shell=True)
-        scenario = open('hartmann_scenario.txt','a')
-        scenario.write("algo = python hartmann.py\n")
-        scenario.write("paramfile = hartmann_pcs.pcs\n")
-        scenario.write("run_obj = quality\n")
-        scenario.write("runcount_limit = "+str(iterations)+"\n")
-        scenario.write("deterministic = 1\n")
-        scenario.write("output_dir = SMAC_output")
-        scenario.close()
-        for i in range(repeats):
-            seed = randint(1,100000)
-            #print(seed)
-            call(["python ../../scripts/smac --seed "+str(seed)+" --scenario hartmann_scenario.txt > SMACout.txt 2> SMACerr.txt &"],shell=True)
-            while (1):
-                time.sleep(1)
-                if os.path.isfile("./SMAC_output/runhistory.json"):
-                    print("Executed run #" + str(i) + ".")
-                    break
-            call(["mv ./SMAC_output/runhistory.json ./SMAC_output/runhistory" + str(i) + ".json"],shell=True)
-            call(["rm ./SMAC_output/traj_aclib2.json"],shell=True)
-            call(["rm ./SMAC_output/traj_old.csv"], shell=True)
-        print("Experiments are done.")
-        output_file = open("SMAC_results.csv",'a')
-        for j in range(repeats):
-            with open('./SMAC_output/runhistory'+str(j)+'.json') as data_file:
-                data = json.load(data_file)
-
-            results = []
-            for i in range(len(data["data"])):
-                results.append(data["data"][i][1][0])
-
-            best_result = results[0]
-            for i in range(1, len(results)):
-                if results[i] < best_result:
-                    best_result = results[i]
-                else:
-                    results[i] = best_result
-            for i in range(len(results)):
-                output_file.write(str(i))
-                output_file.write(",")
-                output_file.write(str(results[i]))
-                output_file.write("\n")
-        output_file.close()
-
-    if experiment == "leadingones":
-        print("Experiment is "+experiment)
-        os.chdir("./SMAC3-master/examples/leadingones/")
-        print("Entered experiment directory")
-        call(["rm leadingones_scenario.txt"],shell=True)
-        print("Removed current scenario file")
-        scenario = open('leadingones_scenario.txt','a')
-        scenario.write("algo = python leadingones.py\n")
-        scenario.write("paramfile = leadingones_pcs.pcs\n")
-        scenario.write("run_obj = quality\n")
-        scenario.write("runcount_limit = "+str(iterations)+"\n")
-        scenario.write("deterministic = 1\n")
-        scenario.write("output_dir = SMAC_output")
-        scenario.close()
-        print("New scenario file is submitted.")
-        for i in range(repeats):
-            print("Start repeating.")
-            print("Repeat # "+str(i))
-            seed = randint(1,100000)
-            print("Seed is: "+str(seed))
-            call(["python ../../scripts/smac --seed "+str(seed)+" --scenario leadingones_scenario.txt > SMACout.txt 2> SMACerr.txt &"],shell=True)
-            print("SMAC script called.")
-            while (1):
-                time.sleep(1)
-                print("Checking runhistory.json...")
-                if os.path.isfile("./SMAC_output/runhistory.json"):
-                    print("File is found")
-                    print("Executed run #" + str(i) + ".")
-                    break 
-                print("File not found.")
-            call(["mv ./SMAC_output/runhistory.json ./SMAC_output/runhistory" + str(i) + ".json"],shell=True)
-            print("Output file is renamed.")
-            call(["rm ./SMAC_output/traj_aclib2.json"],shell=True)
-            call(["rm ./SMAC_output/traj_old.csv"], shell=True)
-            print("Other files are removed.")
-        print("Experiments are done.")
-        output_file = open("SMAC_results.csv",'a')
-        for j in range(repeats):
-            with open('./SMAC_output/runhistory'+str(j)+'.json') as data_file:
-                data = json.load(data_file)
-
-            results = []
-            for i in range(len(data["data"])):
-                results.append(data["data"][i][1][0])
-
-            best_result = results[0]
-            for i in range(1, len(results)):
-                if results[i] < best_result:
-                    best_result = results[i]
-                else:
-                    results[i] = best_result
-            for i in range(len(results)):
-                output_file.write(str(i))
-                output_file.write(",")
-                output_file.write(str(results[i]))
-                output_file.write("\n")
-        output_file.close()
+        best_result = results[0]
+        for i in range(1, len(results)):
+            if results[i] < best_result:
+                best_result = results[i]
+            else:
+                results[i] = best_result
+        for i in range(len(results)):
+            output_file.write(str(i))
+            output_file.write(",")
+            output_file.write(str(results[i]))
+            output_file.write("\n")
+    output_file.close()
 
 #HyperOpt
 if optimizer == "ho":
@@ -221,6 +137,15 @@ if optimizer == "ho":
             array.append([0, 1,"discr"])
         HO(leadingones, 10, array, iterations, repeats)
 
+    if experiment == "plateau":
+        array = []
+        for i in range(10):
+            array.append([-2.34,5.12,"cont"])
+        HO(plateau, 10, array, iterations, repeats)
+
+    if experiment == "logreg":
+        HO(logreg, 4, [[0, 10, "discr"], [0, 10, "discr"], [0, 7, "discr"], [0, 9, "discr"]], iterations, repeats)
+
 #BergstraRandomSearch
 if optimizer == "brs":
     if experiment == "branin":
@@ -235,4 +160,11 @@ if optimizer == "brs":
             array.append([0, 1, "discr"])
         Bergstra(leadingones, 10, array, iterations, repeats)
 
+    if experiment == "plateau":
+        array = []
+        for i in range(10):
+            array.append([-2.34,5.12,"cont"])
+        Bergstra(plateau, 10, array, iterations, repeats)
 
+    if experiment == "logreg":
+        Bergstra(logreg, 4, [[0,10, "discr"],[0,10, "discr"],[0,7, "discr"],[0,9, "discr"]], iterations, repeats)
