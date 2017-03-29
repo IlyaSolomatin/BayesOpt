@@ -1,0 +1,6 @@
+algo = python plateau.py
+paramfile = plateau_pcs.pcs
+run_obj = quality
+runcount_limit = 50
+deterministic = 1
+output_dir = SMAC_output
