@@ -1,0 +1,6 @@
+algo = python logreg.py
+paramfile = logreg_pcs.pcs
+run_obj = quality
+runcount_limit = 100
+deterministic = 1
+output_dir = SMAC_output
